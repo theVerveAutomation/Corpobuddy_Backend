@@ -14,7 +14,6 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // 1. Get profile
     const profileUrl =
       `${SUPABASE_URL}/rest/v1/profiles` +
       `?org_id=eq.${encodeURIComponent(orgId)}` +
@@ -38,7 +37,6 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // 2. Verify password via Supabase Auth
     const tokenRes = await fetch(
       `${SUPABASE_URL}/auth/v1/token?grant_type=password`,
       {
@@ -62,9 +60,15 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    res.cookie("corpobuddy_token", token.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 1000,
+    });
+
     return res.json({
       success: true,
-      token,
       profile,
     });
   } catch (err) {
