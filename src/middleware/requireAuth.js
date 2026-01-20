@@ -33,7 +33,8 @@ export async function requireAuth(req, res, next) {
       }
     );
 
-    const [profile] = await profileRes.json();
+    const profileData = await profileRes.json();
+    const profile = profileData[0]; // FIX: First await, then get array element
 
     req.user = {
       id: authUser.id,
@@ -44,6 +45,7 @@ export async function requireAuth(req, res, next) {
 
     next();
   } catch (err) {
+    console.error("requireAuth error:", err);
     return res.status(401).json({ error: "INVALID_OR_EXPIRED_TOKEN" });
   }
 }
